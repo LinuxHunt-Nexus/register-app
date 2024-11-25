@@ -5,7 +5,7 @@ pipeline {
         maven 'Maven3'
     }
     environment {
-	APP_NAME = "register-app-pipeline"
+	    APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "linuxhuntnexus"
         DOCKER_PASS = 'dockerhub'
@@ -27,26 +27,33 @@ pipeline {
 
         stage("Build Application"){
             steps {
-                sh "mvn clean package"
+                sh "mvn clean package -DskipTests"
+            }
+            post {
+                success {
+                    echo "Now Archiving."
+                    archiveArtifacts artifacts: '**/*.war'
+                }
             }
        }
-	stage("Check War File") {
-	    steps {
-	        sh "ls -l target/"
-	    }
-        }
+
        stage("Test Application"){
            steps {
                  sh "mvn test"
            }
        }
+       stage('Checkstyle Analysis'){
+            steps {
+                sh 'mvn checkstyle:checkstyle'
+            }
+        }
 
        stage("SonarQube Analysis"){
            steps {
 	           script {
 		        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
                         sh "mvn sonar:sonar"
-		        }
+		            }
 	           }	
            }
        }
