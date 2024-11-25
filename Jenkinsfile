@@ -5,7 +5,7 @@ pipeline {
         maven 'Maven3'
     }
     environment {
-	    APP_NAME = "register-app-pipeline"
+	APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "linuxhuntnexus"
         DOCKER_PASS = 'dockerhub'
@@ -27,13 +27,7 @@ pipeline {
 
         stage("Build Application"){
             steps {
-                sh "mvn clean package -DskipTests"
-            }
-            post {
-                success {
-                    echo "Now Archiving."
-                    archiveArtifacts artifacts: '**/*.war'
-                }
+                sh "mvn clean package"
             }
        }
 
