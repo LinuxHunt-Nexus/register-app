@@ -30,7 +30,11 @@ pipeline {
                 sh "mvn clean package"
             }
        }
-
+	stage("Check War File") {
+	    steps {
+	        sh "ls -l target/"
+	    }
+        }
        stage("Test Application"){
            steps {
                  sh "mvn test"
