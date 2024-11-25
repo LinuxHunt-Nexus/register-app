@@ -5,7 +5,7 @@ pipeline {
         maven 'Maven3'
     }
     environment {
-	    APP_NAME = "register-app-pipeline"
+	APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "linuxhuntnexus"
         DOCKER_PASS = 'dockerhub'
@@ -14,15 +14,15 @@ pipeline {
     }
     stages{
         stage("Cleanup Workspace"){
-                steps {
+            steps {
                 cleanWs()
-                }
+            }
         }
 
         stage("Checkout from SCM"){
-                steps {
-                    git branch: 'main', credentialsId: 'github', url: 'https://github.com/LinuxHunt-Nexus/register-app.git'
-                }
+            steps {
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/LinuxHunt-Nexus/register-app.git'
+            }
         }
 
         stage("Build Application"){
@@ -70,6 +70,6 @@ pipeline {
                 }
             }
         }
-        
+
     }
 }
