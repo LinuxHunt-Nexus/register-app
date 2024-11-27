@@ -76,7 +76,7 @@ pipeline {
             }
         }
 
-        /*stage("Trivy Scan") {
+        stage("Trivy Scan") {
             steps {
                 script {
                  sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image linuxhuntnexus/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
@@ -91,7 +91,7 @@ pipeline {
                      sh "docker rmi ${IMAGE_NAME}:latest"
                 }
            }
-        }*/
+        }
 
     }
 }
