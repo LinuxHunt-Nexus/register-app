@@ -4,14 +4,14 @@ pipeline {
         jdk 'Java17'
         maven 'Maven3'
     }
-    /*environment {
+    environment {
 	APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "linuxhuntnexus"
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-    }*/
+    }
     stages{
         stage("Cleanup Workspace"){
             steps {
@@ -61,7 +61,7 @@ pipeline {
 
         }
 
-        /*stage("Build & Push Docker Image") {
+        stage("Build & Push Docker Image") {
             steps {
                 script {
                     docker.withRegistry('',DOCKER_PASS) {
@@ -76,7 +76,7 @@ pipeline {
             }
         }
 
-        stage("Trivy Scan") {
+        /*stage("Trivy Scan") {
             steps {
                 script {
                  sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image linuxhuntnexus/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
