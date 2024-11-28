@@ -4,7 +4,11 @@ pipeline {
         jdk 'Java17'
         maven 'Maven3'
     }
+    environment {
+        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+    }
     stages{
+        
         stage("Cleanup Workspace"){
             steps {
                 cleanWs()
@@ -39,6 +43,13 @@ pipeline {
                 sh 'mvn checkstyle:checkstyle'
             }
         }
-
+        stage("Trigger Remotely") {
+            steps {
+                script {
+                    def triggerUrl = "${env.ec2-51-20-83-22.eu-north-1.compute.amazonaws.com:8080}/job/register-app-pipeline/buildWithParameters?token=${env.JENKINS_API_TOKEN}"
+                    echo "Trigger URL: ${triggerUrl}"
+                }
+            }
+        }
     }
 }
