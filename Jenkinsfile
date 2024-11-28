@@ -47,14 +47,17 @@ pipeline {
         stage('Sonar Analysis') {
             steps {
                withSonarQubeEnv('SonarQube') {
-                   sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
-                   -Dsonar.projectName=vprofile \
-                   -Dsonar.projectVersion=1.0 \
-                   -Dsonar.sources=server/src/main/java/ \
-                   -Dsonar.java.binaries=target/classes/ \
-                   -Dsonar.junit.reportsPath=target/surefire-reports/ \
-                   -Dsonar.jacoco.reportsPath=target/jacoco.exec \
-                   -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
+                   sh '''
+                    ${scannerHome}/bin/sonar-scanner -X \
+                    -Dsonar.projectKey=vprofile \
+                    -Dsonar.projectName=vprofile \
+                    -Dsonar.projectVersion=1.0 \
+                    -Dsonar.sources=server/src/main/java/ \
+                    -Dsonar.java.binaries=server/target/classes/ \
+                    -Dsonar.junit.reportsPath=server/target/surefire-reports/ \
+                    -Dsonar.jacoco.reportsPath=server/target/jacoco.exec \
+                    -Dsonar.java.checkstyle.reportPaths=server/target/checkstyle-result.xml
+                   '''
               }
             }
         }
