@@ -92,6 +92,11 @@ pipeline {
                 }
             }
         }
+	stage("Trivy DB Update") {
+            steps {
+                sh "docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --download-db-only"
+            }
+        }
         stage("Trivy Scan") {
            steps {
                script {
