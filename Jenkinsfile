@@ -46,7 +46,7 @@ pipeline {
         stage("Trigger Remotely") {
             steps {
                 script {
-                    def triggerUrl = "${env.ec2-51-20-83-22.eu-north-1.compute.amazonaws.com:8080}/job/register-app-pipeline/buildWithParameters?token=${env.JENKINS_API_TOKEN}"
+                    def triggerUrl = "ec2-51-20-83-22.eu-north-1.compute.amazonaws.com:8080/job/register-app-pipeline/buildWithParameters?token=${env.JENKINS_API_TOKEN}"
                     echo "Trigger URL: ${triggerUrl}"
                 }
             }
