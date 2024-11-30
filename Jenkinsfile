@@ -91,7 +91,7 @@ pipeline {
                     protocol: 'http',
                     nexusUrl: '13.60.23.143:8081',
                     groupId: 'QA',
-                    version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                    version: "${env.BUILD_ID}",
                     repository: 'webapp-repo',
                     credentialsId: 'nexus',
                     artifacts: [
@@ -106,7 +106,7 @@ pipeline {
 	stage("Build & Push Docker Image") {
             steps {
                 script {
-		    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
+		    //sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
                     docker.withRegistry('',DOCKER_PASS) {
                         docker_image = docker.build "${IMAGE_NAME}"
                     }
