@@ -86,7 +86,7 @@ pipeline {
                     protocol: 'http',
                     nexusUrl: '13.60.23.143:8081',
                     groupId: 'QA',
-                    version: "${env.BUILD_ID}",
+                    version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
                     repository: 'webapp-repo',
                     credentialsId: 'nexus',
                     artifacts: [
