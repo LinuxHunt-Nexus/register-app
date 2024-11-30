@@ -79,25 +79,25 @@ pipeline {
                 }
             }
         }
-	    stage("UploadArtifact"){
-            steps{
-                nexusArtifactUploader(
-                  nexusVersion: 'nexus3',
-                  protocol: 'http',
-                  nexusUrl: '172.31.40.134:8081',
-                  groupId: 'QA',
-                  version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-                  repository: 'webapp-repo',
-                  credentialsId: 'NEXUS_TOKEN',
-                  artifacts: [
-                    [artifactId: 'WEBAPP',
-                     classifier: '',
-                     file: 'target/webapp/webapp.war',
-                     type: 'war']
-		            ]
-		        )
-            }
-        }
+	stage("UploadArtifact") {
+	    steps {
+	        nexusArtifactUploader(
+	            nexusVersion: 'nexus3',
+	            protocol: 'http',
+	            nexusUrl: '13.60.23.143:8081',
+	            groupId: 'QA',
+	            version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+	            repository: 'webapp-repo',
+	            credentialsId: 'NEXUS_TOKEN',
+	            artifacts: [
+	                [artifactId: 'WEBAPP',
+	                 classifier: '',
+	                 file: 'webapp/target/webapp.war', // সঠিক পাথটি এখানে উল্লেখ করুন
+	                 type: 'war']
+	            ]
+	        )
+	    }
+	}
 	    /*
         stage("Build & Push Docker Image") {
             steps {
