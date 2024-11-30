@@ -80,87 +80,24 @@ pipeline {
             }
         }
 	stage("UploadArtifact") {
-	    steps {
-	        nexusArtifactUploader(
-	            nexusVersion: 'nexus3',
-	            protocol: 'http',
-	            nexusUrl: '13.60.23.143:8081',
-	            groupId: 'QA',
-	            version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-	            repository: 'webapp-repo',
-	            credentialsId: 'NEXUS_TOKEN',
-	            artifacts: [
-	                [artifactId: 'WEBAPP',
-	                 classifier: '',
-	                 file: 'webapp/target/webapp.war', // সঠিক পাথটি এখানে উল্লেখ করুন
-	                 type: 'war']
-	            ]
-	        )
+            steps {
+                nexusArtifactUploader(
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: '13.60.23.143:8081',
+                    groupId: 'QA',
+                    version: "${env.BUILD_ID}",
+                    repository: 'webapp-repo',
+                    credentialsId: 'NEXUS_TOKEN',
+                    artifacts: [
+                        [artifactId: 'webapp',
+                         classifier: '',
+                         file: 'target/webapp.war',
+                         type: 'war']
+                    	]
+                )
 	    }
 	}
-	    /*
-        stage("Build & Push Docker Image") {
-            steps {
-                script {
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image = docker.build "${IMAGE_NAME}"
-                    }
-
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('latest')
-                    }
-                }
-            }
-        }
-	    stage("Trivy DB Update") {
-            steps {
-                sh "docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --download-db-only"
-            }
-        }
-        stage("Trivy Scan") {
-           steps {
-               script {
-	            sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image linuxhuntnexus/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
-               }
-           }
-       }
-
-       stage ('Cleanup Artifacts') {
-           steps {
-               script {
-                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker rmi ${IMAGE_NAME}:latest"
-               }
-          }
-       }
-        stage("Trigger Remotely") {
-            steps {
-                script {
-                    def triggerUrl = "ec2-51-21-2-55.eu-north-1.compute.amazonaws.com:8080/job/register-app-pipeline/buildWithParameters?token=${env.JENKINS_API_TOKEN}"
-                    echo "Trigger URL: ${triggerUrl}"
-                }
-            }
-        }
-	    stage("CD Trigger Pipeline") {
-            steps {
-                script {
-                    sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'http://ec2-51-21-2-55.eu-north-1.compute.amazonaws.com:8080/job/gitops-register-app-cd-pipeline/buildWithParameters?token=gitops-token'"
-                }
-            }
-       }*/
+	    
     }
-
-    // post {
-    //    failure {
-    //          emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
-    //                   subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed", 
-    //                   mimeType: 'text/html',to: "linuxhuntnexus@gmail.com"
-    //   }
-    //   success {
-    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
-    //                  subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful", 
-    //                  mimeType: 'text/html',to: "linuxhuntnexus@gmail.com"
-    //   }
-    // }
 }
