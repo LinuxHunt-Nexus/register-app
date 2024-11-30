@@ -88,7 +88,7 @@ pipeline {
                     groupId: 'QA',
                     version: "${env.BUILD_ID}",
                     repository: 'webapp-repo',
-                    credentialsId: 'NEXUS_TOKEN',
+                    credentialsId: "${NEXUS_TOKEN}",
                     artifacts: [
                         [artifactId: 'webapp',
                          classifier: '',
