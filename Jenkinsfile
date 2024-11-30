@@ -13,7 +13,7 @@ pipeline {
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         
         JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
-	NEXUS_TOKEN = credentials("JENKINS_API_TOKEN")
+	NEXUS_TOKEN = credentials("nexus")
         
         scannerHome = tool 'Sonar-Scanner'
     }
@@ -88,7 +88,7 @@ pipeline {
                   groupId: 'QA',
                   version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
                   repository: 'webapp-repo',
-                  credentialsId: '${NEXUS_TOKEN}',
+                  credentialsId: 'NEXUS_TOKEN',
                   artifacts: [
                     [artifactId: 'WEBAPP',
                      classifier: '',
