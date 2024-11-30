@@ -103,7 +103,56 @@ pipeline {
                 )
 	    }
 	}
-	    
+	stage("Build & Push Docker Image") {
+            steps {
+                script {
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
+                    }
+                }
+            }
+        }
+	    stage("Trivy DB Update") {
+            steps {
+                sh "docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --download-db-only"
+            }
+        }
+        stage("Trivy Scan") {
+           steps {
+               script {
+	            sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image linuxhuntnexus/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
+               }
+           }
+       }
+
+       stage ('Cleanup Artifacts') {
+           steps {
+               script {
+                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker rmi ${IMAGE_NAME}:latest"
+               }
+          }
+       }
+        stage("Trigger Remotely") {
+            steps {
+                script {
+                    def triggerUrl = "ec2-51-21-2-55.eu-north-1.compute.amazonaws.com:8080/job/register-app-pipeline/buildWithParameters?token=${env.JENKINS_API_TOKEN}"
+                    echo "Trigger URL: ${triggerUrl}"
+                }
+            }
+        }
+	    stage("CD Trigger Pipeline") {
+            steps {
+                script {
+                    sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'http://ec2-51-21-2-55.eu-north-1.compute.amazonaws.com:8080/job/gitops-register-app-cd-pipeline/buildWithParameters?token=gitops-token'"
+                }
+            }
+       }
     }
 post {
         always {
