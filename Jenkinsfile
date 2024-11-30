@@ -79,7 +79,7 @@ pipeline {
                 }
             }
         }
-	stage("UploadArtifact"){
+	    stage("UploadArtifact"){
             steps{
                 nexusArtifactUploader(
                   nexusVersion: 'nexus3',
@@ -94,10 +94,11 @@ pipeline {
                      classifier: '',
                      file: 'target/webapp/webapp.war',
                      type: 'war']
-		    ]
-		 )
+		            ]
+		        )
             }
         }
+	    /*
         stage("Build & Push Docker Image") {
             steps {
                 script {
@@ -112,7 +113,7 @@ pipeline {
                 }
             }
         }
-	stage("Trivy DB Update") {
+	    stage("Trivy DB Update") {
             steps {
                 sh "docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --download-db-only"
             }
@@ -141,25 +142,25 @@ pipeline {
                 }
             }
         }
-	stage("CD Trigger Pipeline") {
+	    stage("CD Trigger Pipeline") {
             steps {
                 script {
                     sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'http://ec2-51-21-2-55.eu-north-1.compute.amazonaws.com:8080/job/gitops-register-app-cd-pipeline/buildWithParameters?token=gitops-token'"
                 }
             }
-       }
+       }*/
     }
 
-    post {
-       failure {
-             emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
-                      subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed", 
-                      mimeType: 'text/html',to: "linuxhuntnexus@gmail.com"
-      }
-      success {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
-                     subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful", 
-                     mimeType: 'text/html',to: "linuxhuntnexus@gmail.com"
-      }
-    }
+    // post {
+    //    failure {
+    //          emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
+    //                   subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed", 
+    //                   mimeType: 'text/html',to: "linuxhuntnexus@gmail.com"
+    //   }
+    //   success {
+    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
+    //                  subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful", 
+    //                  mimeType: 'text/html',to: "linuxhuntnexus@gmail.com"
+    //   }
+    // }
 }
