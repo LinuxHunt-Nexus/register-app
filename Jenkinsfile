@@ -13,6 +13,7 @@ pipeline {
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         
         JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+	NEXUS_TOKEN = credentials("JENKINS_API_TOKEN")
         
         scannerHome = tool 'Sonar-Scanner'
     }
@@ -57,8 +58,8 @@ pipeline {
                withSonarQubeEnv('SonarQube') {
                    sh '''
                     ${scannerHome}/bin/sonar-scanner -X \
-                    -Dsonar.projectKey=vprofile \
-                    -Dsonar.projectName=vprofile \
+                    -Dsonar.projectKey=webapp \
+                    -Dsonar.projectName=webapp \
                     -Dsonar.projectVersion=1.0 \
                     -Dsonar.sources=server/src/main/java/ \
                     -Dsonar.java.binaries=server/target/classes/ \
@@ -76,6 +77,25 @@ pipeline {
                     // true = set pipeline to UNSTABLE, false = don't
                     waitForQualityGate abortPipeline: true, credentialsId: 'jenkins-sonarqube-token'
                 }
+            }
+        }
+	stage("UploadArtifact"){
+            steps{
+                nexusArtifactUploader(
+                  nexusVersion: 'nexus3',
+                  protocol: 'http',
+                  nexusUrl: '172.31.40.134:8081',
+                  groupId: 'QA',
+                  version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                  repository: 'webapp-repo',
+                  credentialsId: '${NEXUS_TOKEN}',
+                  artifacts: [
+                    [artifactId: 'WEBAPP',
+                     classifier: '',
+                     file: 'target/webapp/webapp.war',
+                     type: 'war']
+		    ]
+		 )
             }
         }
         stage("Build & Push Docker Image") {
@@ -116,7 +136,7 @@ pipeline {
         stage("Trigger Remotely") {
             steps {
                 script {
-                    def triggerUrl = "ec2-51-20-83-22.eu-north-1.compute.amazonaws.com:8080/job/register-app-pipeline/buildWithParameters?token=${env.JENKINS_API_TOKEN}"
+                    def triggerUrl = "ec2-51-21-2-55.eu-north-1.compute.amazonaws.com:8080/job/register-app-pipeline/buildWithParameters?token=${env.JENKINS_API_TOKEN}"
                     echo "Trigger URL: ${triggerUrl}"
                 }
             }
@@ -124,7 +144,7 @@ pipeline {
 	stage("CD Trigger Pipeline") {
             steps {
                 script {
-                    sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'http://ec2-51-20-83-22.eu-north-1.compute.amazonaws.com:8080/job/gitops-register-app-cd-pipeline/buildWithParameters?token=gitops-token'"
+                    sh "curl -v -k --user admin:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'http://ec2-51-21-2-55.eu-north-1.compute.amazonaws.com:8080/job/gitops-register-app-cd-pipeline/buildWithParameters?token=gitops-token'"
                 }
             }
        }
